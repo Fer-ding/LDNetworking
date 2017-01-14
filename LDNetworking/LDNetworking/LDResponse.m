@@ -45,9 +45,9 @@
     if (self) {
         self.status = LDResponseStatusSuccess;
         
-//        self.requestId = [requestId integerValue];
+        //        self.requestId = [requestId integerValue];
         self.request = request;
-//        self.requestParams = params;
+        //        self.requestParams = params;
         
         self.responseData = [NSJSONSerialization dataWithJSONObject:responseObject options:NSJSONWritingPrettyPrinted error:nil];
         
@@ -77,9 +77,9 @@
     if (self) {
         self.status = [self responseStatusWithError:error];
         
-//        self.requestId = [requestId integerValue];
+        //        self.requestId = [requestId integerValue];
         self.request = request;
-//        self.requestParams = params;
+        //        self.requestParams = params;
         
         NSError *underError = error.userInfo[@"NSUnderlyingError"];
         NSData *responseData = underError.userInfo[@"com.alamofire.serialization.response.error.data"];
@@ -109,7 +109,7 @@
     if (self) {
         self.status = LDResponseStatusSuccess;
         
-//        self.requestId = 0;
+        //        self.requestId = 0;
         self.request = nil;
         
         self.responseData = [data copy];

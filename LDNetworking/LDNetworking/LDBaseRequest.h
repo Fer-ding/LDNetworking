@@ -10,19 +10,20 @@
 #import "AFNetworking.h"
 #import "LDResponse.h"
 
-typedef NS_ENUM(NSUInteger, LDBaseRequestErrorType) {
-    LDBaseRequestErrorTypeDefault,     //没有产生过API请求，这个是manager的默认状态。
-    LDBaseRequestErrorTypeSuccess,     //API请求成功且返回数据正确，此时manager的数据是可以直接拿来使用。
-    LDBaseRequestErrorTypeNoContent,   //API请求成功但返回数据不正确，如果回调数据验证函数返回值为NO，manager的状态就会是这个。
-    LDBaseRequestErrorTypeParamsError, //参数错误，此时manager不会调用API，因为参数验证是在调用API之前做的。
-    LDBaseRequestErrorTypeTimeout,     //请求超时。具体超时时间的设置根据不同需求而有所差别。
-    LDBaseRequestErrorTypeNoNetWork    //网络不通。在调用API之前会判断一下当前网络是否通畅，这个也是在调用API之前验证的，和上面超时的状态是有区别的。
+typedef NS_ENUM(NSUInteger, LDRequestState) {
+    LDRequestStateDefault,     //没有产生过API请求，这个是manager的默认状态。
+    LDRequestStateSuccess,     //API请求成功且返回数据正确，此时manager的数据是可以直接拿来使用。
+    LDRequestStateContentError,   //API请求成功但返回数据不正确，如果回调数据验证函数返回值为NO，manager的状态就会是这个。
+    LDRequestStateNetError,    //API请求返回失败。
+    LDRequestStateParamsError, //参数错误，此时manager不会调用API，因为参数验证是在调用API之前做的。
+    LDRequestStateTimeout,     //请求超时。具体超时时间的设置根据不同需求而有所差别。
+    LDRequestStateNoNetWork    //网络不通。在调用API之前会判断一下当前网络是否通畅，这个也是在调用API之前验证的，和上面超时的状态是有区别的。
 };
 
-typedef NS_ENUM(NSUInteger, LDRequestMethod) {
-    LDRequestMethodGet,
-    LDRequestMethodPost,
-    LDRequestMethodUpload      //上传文件
+typedef NS_ENUM(NSUInteger, LDRequestType) {
+    LDRequestTypeGet,
+    LDRequestTypePost,
+    LDRequestTypeUpload      //上传文件
 };
 
 @class LDBaseRequest;
@@ -100,7 +101,7 @@ typedef void(^LDRequestCompletionBlock)(__kindof LDBaseRequest *request);
 - (NSString *)baseUrl;
 
 /// Http请求的方法
-- (LDRequestMethod)requestMethod;
+- (LDRequestType)requestType;
 
 /// 请求的参数列表
 - (id)requestArgument;

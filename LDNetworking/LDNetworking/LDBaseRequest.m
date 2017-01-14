@@ -24,8 +24,8 @@
     return 60;
 }
 
-- (LDRequestMethod)requestMethod {
-    return LDRequestMethodGet;
+- (LDRequestType)requestType {
+    return LDRequestTypeGet;
 }
 
 - (NSDictionary *)requestHeaderFieldValueDictionary {
@@ -97,66 +97,93 @@
 
 - (void)loadDataWithRequest:(LDBaseRequest *)request {
     
+    //参数设置，如果设置了requestArgument，代理会被覆盖
+    id param = request.requestArgument;
+    if (param == nil) {
+        param = [request.paramSource paramsForRequest:request];
+    }
+    if ([self isCorrectWithParamsData:param]) {    //检查参数正确性
+        // 实际的网络请求
+        if ([self isReachable]) {              // 有网络
+            [[LDRequestProxy sharedInstance] sendRequest:request success:^(LDResponse *response) {
+                [self successedOnCallingAPI:response];
+            } failure:^(LDResponse *response) {
+                [self failedOnCallingAPI:response withErrorState:LDRequestStateNetError];
+            }];
+        } else { // 没网
+            [self failedOnCallingAPI:nil withErrorState:LDRequestStateNoNetWork];
+        }
+    } else {
+        [self failedOnCallingAPI:nil withErrorState:LDRequestStateParamsError];
+    }
 }
 
-//#pragma mark -- 验证器(validator)方法
-//-(BOOL)isCorrectWithParamsData:(NSDictionary*)params
-//{
-//    if ([self.validator respondsToSelector:@selector(request:isCorrectWithParamsData:)]) {
-//        return [self.validator request:self isCorrectWithParamsData:params];
-//    }else{
-//        return YES;
-//    }
-//}
-//
-//-(BOOL)isCorrectWithResponseData:(NSDictionary*)data
-//{
-//    if ([self.validator respondsToSelector:@selector(request:isCorrectWithResponseData:)]) {
-//        return [self.validator request:self isCorrectWithResponseData:data];
-//    }else{
-//        return YES;
-//    }
-//}
-//-(NSString*)getMethodName
-//{
-//    NSString *methodName = [NSString stringWithFormat:@"%@_%@_%@",[self convertRequestMethod:self.child.requestMethod], @"token", self.child.requestUrl];
-//    return methodName;
-//}
+#pragma mark -- 验证器(validator)方法
+- (BOOL)isCorrectWithParamsData:(NSDictionary*)params {
+    
+    if ([self.validator respondsToSelector:@selector(request:isCorrectWithParamsData:)]) {
+        return [self.validator request:self isCorrectWithParamsData:params];
+    }else{
+        return YES;
+    }
+}
 
-#pragma mark - private method
+- (BOOL)isCorrectWithResponseData:(NSDictionary*)data {
+    
+    if ([self.validator respondsToSelector:@selector(request:isCorrectWithResponseData:)]) {
+        return [self.validator request:self isCorrectWithResponseData:data];
+    }else{
+        return YES;
+    }
+}
 
-//- (void)removeRequestIdWithRequestID:(NSInteger)requestId {
-//    
-//    NSNumber *requestIDToRemove = nil;
-//    for (NSNumber *storedRequestId in self.requestIdList) {
-//        if ([storedRequestId integerValue] == requestId) {
-//            requestIDToRemove = storedRequestId;
-//        }
-//    }
-//    if (requestIDToRemove) {
-//        [self.requestIdList removeObject:requestIDToRemove];
-//    }
-//}
-//
-//- (NSString*)convertRequestMethod:(LDBaseRequestMethod)method {
-//    NSString* str;
-//    switch (method) {
-//        case LDBaseRequestMethodPost:
-//            str = @"POST";
-//            break;
-//        case LDBaseRequestMethodGet:
-//            str = @"GET";
-//            break;
-//        case LDBaseRequestMethodUpload:
-//            str = @"UPLOAD";
-//            break;
-//        default:
-//            break;
-//    }
-//    return str;
-//}
+#pragma mark - api 回调执行的方法
+- (void)successedOnCallingAPI:(LDResponse *)response {
+    
+    if ([self isCorrectWithResponseData:response.content]) {  //检查JSON
+        [self beforePerformSuccessWithResponse:response];
+        
+        if ([self.delegate respondsToSelector:@selector(requestDidSuccess:)]) {
+            [self.delegate requestDidSuccess:self];
+        }
+        if (self.successCompletionBlock) {
+            self.successCompletionBlock(self);
+        }
+        
+        [self afterPerformSuccessWithResponse:response];
+    } else {
+        [self failedOnCallingAPI:response withErrorState:LDRequestStateContentError];
+    }
+}
 
-#pragma mark - getters and setters
+- (void)failedOnCallingAPI:(LDResponse *)response withErrorState:(LDRequestState)state {
+    
+}
+
+/** 接口返回成功，返回控制器回调requestDidSuccess之前的操作 */
+- (void)beforePerformSuccessWithResponse:(LDResponse *)response
+{
+    
+}
+
+/** 接口返回失败，返回控制器回调requestDidFailed之前的操作 */
+- (void)beforePerformFailWithResponse:(LDResponse *)response
+{
+    
+}
+
+/** 接口返回成功，返回控制器回调requestDidSuccess之后的操作 */
+- (void)afterPerformSuccessWithResponse:(LDResponse *)response
+{
+    
+}
+
+/** 接口返回失败，返回控制器回调requestDidFailed之后的操作 */
+- (void)afterPerformFailWithResponse:(LDResponse *)response
+{
+    
+}
+
 //- (LDCache *)cache {
 //    if (!_cache) {
 //        _cache = [LDCache sharedInstance];
@@ -171,18 +198,14 @@
 //    return _requestIdList;
 //}
 //
-//- (BOOL)isReachable
-//{
-//    if ([AFNetworkReachabilityManager sharedManager].networkReachabilityStatus == AFNetworkReachabilityStatusUnknown) {
-//        return YES;
-//    } else {
-//        return [[AFNetworkReachabilityManager sharedManager] isReachable];
-//    }
-//}
-//
-//- (BOOL)isLoading
-//{
-//    return [self.requestIdList count] > 0;
-//}
+- (BOOL)isReachable
+{
+    if ([AFNetworkReachabilityManager sharedManager].networkReachabilityStatus == AFNetworkReachabilityStatusUnknown) {
+        return YES;
+    } else {
+        return [[AFNetworkReachabilityManager sharedManager] isReachable];
+    }
+}
+
 
 @end

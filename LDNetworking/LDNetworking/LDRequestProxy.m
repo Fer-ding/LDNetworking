@@ -67,7 +67,7 @@ FOUNDATION_EXPORT void LDLog(NSString *format, ...) NS_FORMAT_FUNCTION(1,2);
     self.success = success;
     self.failure = failure;
     
-    LDRequestMethod method = [request requestMethod];
+    LDRequestType type = [request requestType];
     NSString *url = [self buildRequestUrl:request];
     
     //参数设置，如果设置了requestArgument，代理会被覆盖
@@ -92,19 +92,19 @@ FOUNDATION_EXPORT void LDLog(NSString *format, ...) NS_FORMAT_FUNCTION(1,2);
         }
     }
     
-    if (method == LDRequestMethodGet) {
+    if (type == LDRequestTypeGet) {
         request.requestTask = [_manager GET:url parameters:param success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
             [self handleRequestResult:task responseObject:responseObject];
         } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
             [self handleRequestResult:task responseObject:error];
         }];
-    } else if (method == LDRequestMethodPost) {
+    } else if (type == LDRequestTypePost) {
         request.requestTask = [_manager POST:url parameters:param success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
             [self handleRequestResult:task responseObject:responseObject];
         } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
             [self handleRequestResult:task responseObject:error];
         }];
-    } else if (method == LDRequestMethodUpload) {
+    } else if (type == LDRequestTypeUpload) {
         request.requestTask = [_manager POST:url parameters:param constructingBodyWithBlock:constructingBlock progress:^(NSProgress * _Nonnull uploadProgress) {
             
         } success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
