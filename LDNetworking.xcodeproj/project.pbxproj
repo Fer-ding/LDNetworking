@@ -19,9 +19,9 @@
 		585B89001E232ACF00651C4E /* AFURLRequestSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 585B88F81E232ACF00651C4E /* AFURLRequestSerialization.m */; };
 		585B89011E232ACF00651C4E /* AFURLResponseSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 585B88FA1E232ACF00651C4E /* AFURLResponseSerialization.m */; };
 		585B89021E232ACF00651C4E /* AFURLSessionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 585B88FC1E232ACF00651C4E /* AFURLSessionManager.m */; };
-		587F03221E263F0C00C8C5D7 /* LDRequestProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 587F031F1E263F0C00C8C5D7 /* LDRequestProxy.m */; };
-		587F03231E263F0C00C8C5D7 /* LDResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 587F03211E263F0C00C8C5D7 /* LDResponse.m */; };
+		587F03221E263F0C00C8C5D7 /* LDNetworkAgent.m in Sources */ = {isa = PBXBuildFile; fileRef = 587F031F1E263F0C00C8C5D7 /* LDNetworkAgent.m */; };
 		587F03261E263F1800C8C5D7 /* LDBaseRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 587F03251E263F1800C8C5D7 /* LDBaseRequest.m */; };
+		5F27D3711E2A429100FCA30A /* LDNetworkConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 5F27D3701E2A429100FCA30A /* LDNetworkConfig.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -48,12 +48,12 @@
 		585B88FA1E232ACF00651C4E /* AFURLResponseSerialization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AFURLResponseSerialization.m; sourceTree = "<group>"; };
 		585B88FB1E232ACF00651C4E /* AFURLSessionManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AFURLSessionManager.h; sourceTree = "<group>"; };
 		585B88FC1E232ACF00651C4E /* AFURLSessionManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AFURLSessionManager.m; sourceTree = "<group>"; };
-		587F031E1E263F0C00C8C5D7 /* LDRequestProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LDRequestProxy.h; sourceTree = "<group>"; };
-		587F031F1E263F0C00C8C5D7 /* LDRequestProxy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LDRequestProxy.m; sourceTree = "<group>"; };
-		587F03201E263F0C00C8C5D7 /* LDResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LDResponse.h; sourceTree = "<group>"; };
-		587F03211E263F0C00C8C5D7 /* LDResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LDResponse.m; sourceTree = "<group>"; };
+		587F031E1E263F0C00C8C5D7 /* LDNetworkAgent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LDNetworkAgent.h; sourceTree = "<group>"; };
+		587F031F1E263F0C00C8C5D7 /* LDNetworkAgent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LDNetworkAgent.m; sourceTree = "<group>"; };
 		587F03241E263F1800C8C5D7 /* LDBaseRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LDBaseRequest.h; sourceTree = "<group>"; };
 		587F03251E263F1800C8C5D7 /* LDBaseRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LDBaseRequest.m; sourceTree = "<group>"; };
+		5F27D36F1E2A429100FCA30A /* LDNetworkConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LDNetworkConfig.h; sourceTree = "<group>"; };
+		5F27D3701E2A429100FCA30A /* LDNetworkConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LDNetworkConfig.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -134,10 +134,10 @@
 			children = (
 				587F03241E263F1800C8C5D7 /* LDBaseRequest.h */,
 				587F03251E263F1800C8C5D7 /* LDBaseRequest.m */,
-				587F031E1E263F0C00C8C5D7 /* LDRequestProxy.h */,
-				587F031F1E263F0C00C8C5D7 /* LDRequestProxy.m */,
-				587F03201E263F0C00C8C5D7 /* LDResponse.h */,
-				587F03211E263F0C00C8C5D7 /* LDResponse.m */,
+				587F031E1E263F0C00C8C5D7 /* LDNetworkAgent.h */,
+				587F031F1E263F0C00C8C5D7 /* LDNetworkAgent.m */,
+				5F27D36F1E2A429100FCA30A /* LDNetworkConfig.h */,
+				5F27D3701E2A429100FCA30A /* LDNetworkConfig.m */,
 			);
 			path = LDNetworking;
 			sourceTree = "<group>";
@@ -215,7 +215,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				585B89021E232ACF00651C4E /* AFURLSessionManager.m in Sources */,
-				587F03231E263F0C00C8C5D7 /* LDResponse.m in Sources */,
 				587F03261E263F1800C8C5D7 /* LDBaseRequest.m in Sources */,
 				585B88E01E232ABD00651C4E /* ViewController.m in Sources */,
 				585B88DD1E232ABD00651C4E /* AppDelegate.m in Sources */,
@@ -223,8 +222,9 @@
 				585B88DA1E232ABD00651C4E /* main.m in Sources */,
 				585B88FF1E232ACF00651C4E /* AFSecurityPolicy.m in Sources */,
 				585B89001E232ACF00651C4E /* AFURLRequestSerialization.m in Sources */,
+				5F27D3711E2A429100FCA30A /* LDNetworkConfig.m in Sources */,
 				585B89011E232ACF00651C4E /* AFURLResponseSerialization.m in Sources */,
-				587F03221E263F0C00C8C5D7 /* LDRequestProxy.m in Sources */,
+				587F03221E263F0C00C8C5D7 /* LDNetworkAgent.m in Sources */,
 				585B88FD1E232ACF00651C4E /* AFHTTPSessionManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

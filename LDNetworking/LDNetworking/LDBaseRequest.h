@@ -7,8 +7,6 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "AFNetworking.h"
-#import "LDResponse.h"
 
 typedef NS_ENUM(NSUInteger, LDRequestState) {
     LDRequestStateDefault,     //没有产生过API请求，这个是manager的默认状态。
@@ -25,6 +23,22 @@ typedef NS_ENUM(NSUInteger, LDRequestType) {
     LDRequestTypePost,
     LDRequestTypeUpload      //上传文件
 };
+
+///  Request serializer type.
+typedef NS_ENUM(NSInteger, LDRequestSerializerType) {
+    LDRequestSerializerTypeHTTP = 0,
+    LDRequestSerializerTypeJSON,
+};
+
+///  Response serializer type.
+typedef NS_ENUM(NSInteger, LDResponseSerializerType) {
+    /// NSData type
+    LDResponseSerializerTypeHTTP,
+    /// JSON object type
+    LDResponseSerializerTypeJSON,
+};
+
+@protocol AFMultipartFormData;
 
 @class LDBaseRequest;
 
@@ -48,7 +62,7 @@ typedef void(^LDRequestCompletionBlock)(__kindof LDBaseRequest *request);
 
 #pragma mark -- 验证器，用于验证API的返回或者调用API的参数是否正确
 @protocol LDBaseRequestValidator <NSObject>
-@required
+@optional
 //验证CallBack数据的正确性
 - (BOOL)request:(LDBaseRequest *)request isCorrectWithResponseData:(NSDictionary *)data;
 //验证传递的参数数据的正确性
@@ -57,8 +71,6 @@ typedef void(^LDRequestCompletionBlock)(__kindof LDBaseRequest *request);
 
 @interface LDBaseRequest : NSObject
 
-@property (nonatomic, strong) NSURLSessionDataTask * requestTask;
-
 @property (nonatomic, weak) id<LDBaseRequestParamDelegate> paramSource;
 @property (nonatomic, weak) id<LDBaseRequestCallBackDelegate> delegate;
 @property (nonatomic, weak) id<LDBaseRequestValidator> validator;
@@ -66,11 +78,19 @@ typedef void(^LDRequestCompletionBlock)(__kindof LDBaseRequest *request);
 @property (nonatomic, copy) LDRequestCompletionBlock successCompletionBlock;
 @property (nonatomic, copy) LDRequestCompletionBlock failureCompletionBlock;
 
-- (BOOL)isExecuting;
-
-///** 是否正在请求数据 */
-//@property (nonatomic, assign, readonly) BOOL isLoading;
-//@property (nonatomic, assign, readonly) BOOL isReachable;
+@property (nonatomic, strong, readonly) NSURLSessionTask *requestTask;
+@property (nonatomic, strong, readonly) NSURLRequest *currentRequest;
+@property (nonatomic, strong, readonly) NSURLRequest *originalRequest;
+@property (nonatomic, strong, readonly) NSHTTPURLResponse *response;
+@property (nonatomic, readonly) NSInteger responseStatusCode;
+@property (nonatomic, strong, readonly) NSDictionary *responseHeaders;
+@property (nonatomic, strong, readonly) NSData *responseData;
+@property (nonatomic, strong, readonly) NSString *responseString;
+@property (nonatomic, strong, readonly) id responseObject;
+@property (nonatomic, strong, readonly) id responseJSONObject;
+@property (nonatomic, strong, readonly) NSError *error;
+@property (nonatomic, readonly, getter=isCancelled) BOOL cancelled;
+@property (nonatomic, readonly, getter=isExecuting) BOOL executing;
 
 /** 调用接口 */
 - (void)loadData;
@@ -80,8 +100,6 @@ typedef void(^LDRequestCompletionBlock)(__kindof LDBaseRequest *request);
 
 /// 把block置nil来打破循环引用
 - (void)clearCompletionBlock;
-
-//- (void)deleteCache;
 
 //取消全部网络请求
 - (void)cancelAllRequests;
@@ -103,6 +121,12 @@ typedef void(^LDRequestCompletionBlock)(__kindof LDBaseRequest *request);
 /// Http请求的方法
 - (LDRequestType)requestType;
 
+///  Request serializer type.
+- (LDRequestSerializerType)requestSerializerType;
+
+///  Response serializer type. See also `responseObject`.
+- (LDResponseSerializerType)responseSerializerType;
+
 /// 请求的参数列表
 - (id)requestArgument;
 
@@ -112,14 +136,7 @@ typedef void(^LDRequestCompletionBlock)(__kindof LDBaseRequest *request);
 /// 当POST的内容带有文件等富文本时使用
 - (AFConstructingBlock)constructingBodyBlock;
 
-// 拦截器方法，继承之后需要调用一下super，如果需要其他位置实现拦截， 使用代理
-- (void)beforePerformSuccessWithResponse:(LDResponse *)response;
-- (void)afterPerformSuccessWithResponse:(LDResponse *)response;
-
-- (void)beforePerformFailWithResponse:(LDResponse *)response;
-- (void)afterPerformFailWithResponse:(LDResponse *)response;
-
-- (BOOL)shouldCallAPIWithParams:(NSDictionary *)params;
-- (void)afterCallingAPIWithParams:(NSDictionary *)params;
+// 是否允许使用蜂窝连接
+- (BOOL)allowsCellularAccess;
 
 @end
