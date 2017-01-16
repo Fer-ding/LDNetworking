@@ -9,8 +9,7 @@
 #import "LDNetworkAgent.h"
 #import "AFNetworking.h"
 #import "LDNetworkConfig.h"
-
-FOUNDATION_EXPORT void LDLog(NSString *format, ...) NS_FORMAT_FUNCTION(1,2);
+#import "LDNetworkPrivate.h"
 
 @implementation LDNetworkAgent {
     AFHTTPSessionManager *_manager;
@@ -49,6 +48,12 @@ FOUNDATION_EXPORT void LDLog(NSString *format, ...) NS_FORMAT_FUNCTION(1,2);
     // If detailUrl is valid URL。scheme==http或https，host==www.baidu.com。
     if (temp && temp.scheme && temp.host) {
         return detailUrl;
+    }
+    
+    // Filter URL if needed
+    NSArray *filters = [_config urlFilters];
+    for (id<LDUrlFilterProtocol> f in filters) {
+        detailUrl = [f filterUrl:detailUrl withRequest:request];
     }
     
     NSString *baseUrl;
@@ -90,8 +95,45 @@ FOUNDATION_EXPORT void LDLog(NSString *format, ...) NS_FORMAT_FUNCTION(1,2);
     return requestSerializer;
 }
 
+- (NSURLSessionTask *)sessionTaskForRequest:(LDBaseRequest *)request error:(NSError * _Nullable __autoreleasing *)error {
+    LDRequestType type = [request requestType];
+    NSString *url = [self buildRequestUrl:request];
+    
+    id param = [request requestArgument];
+    if ([request.paramSource respondsToSelector:@selector(paramsForRequest:)] && !param) {
+        param = [request.paramSource paramsForRequest:request];
+    }
+    
+    AFConstructingBlock constructingBlock = [request constructingBodyBlock];
+    AFHTTPRequestSerializer *requestSerializer = [self requestSerializerForRequest:request];
+    
+    switch (type) {
+        case LDRequestTypeGet:
+            return [self dataTaskWithHTTPMethod:@"GET" requestSerializer:requestSerializer URLString:url parameters:param error:error];
+        case LDRequestTypePost:
+            return [self dataTaskWithHTTPMethod:@"POST" requestSerializer:requestSerializer URLString:url parameters:param constructingBodyWithBlock:nil error:error];
+        case LDRequestTypeUpload:
+            return [self dataTaskWithHTTPMethod:@"POST" requestSerializer:requestSerializer URLString:url parameters:param constructingBodyWithBlock:constructingBlock error:error];
+        default:
+            return nil;
+    }
+}
+
 - (void)addRequest:(LDBaseRequest *)request {
     NSParameterAssert(request != nil);
+    
+    NSError * __autoreleasing requestSerializationError = nil;
+    
+    request.requestTask = [self sessionTaskForRequest:request error:&requestSerializationError];
+    
+    if (requestSerializationError) {
+        [self requestDidFailWithRequest:request error:requestSerializationError];
+    }
+    
+    // Retain request
+    LDLog(@"Add request: %@", NSStringFromClass([request class]));
+    [self addRequestToRecord:request];
+    [request.requestTask resume];
 }
 
 - (void)cancelRequest:(LDBaseRequest *)request {
@@ -108,23 +150,90 @@ FOUNDATION_EXPORT void LDLog(NSString *format, ...) NS_FORMAT_FUNCTION(1,2);
         NSArray *copiedKeys = [allKeys copy];
         for (NSNumber *key in copiedKeys) {
             LDBaseRequest *request = _requestsRecord[key];
-            // We are using non-recursive lock.
-            // Do not lock `stop`, otherwise deadlock may occur.
             [request cancel];
         }
     }
 }
 
 - (BOOL)validateResult:(LDBaseRequest *)request error:(NSError * _Nullable __autoreleasing *)error {
+//    BOOL result = [request statusCodeValidator];
+//    if (!result) {
+//        if (error) {
+//            *error = [NSError errorWithDomain:LDRequestValidationErrorDomain code:LDRequestValidationErrorInvalidStatusCode userInfo:@{NSLocalizedDescriptionKey:@"Invalid status code"}];
+//        }
+//        return result;
+//    }
+    if ([request.validator respondsToSelector:@selector(request:isCorrectWithResponseData:)]) {
+        return [request.validator request:request isCorrectWithResponseData:request.responseObject];
+    }
+    return YES;
 }
 
 - (void)handleRequestResult:(NSURLSessionTask *)task responseObject:(id)responseObject error:(NSError *)error {
+    LDBaseRequest *request = _requestsRecord[@(task.taskIdentifier)];
+    if (!request) {
+        return;
+    }
+    
+    LDLog(@"Finished Request: %@", NSStringFromClass([request class]));
+    
+    NSError * __autoreleasing serializationError = nil;
+    NSError * __autoreleasing validationError = nil;
+    
+    NSError *requestError = nil;
+    BOOL succeed = NO;
+    
+    request.responseObject = responseObject;
+    if ([request.responseObject isKindOfClass:[NSData class]]) {
+        request.responseData = responseObject;
+        request.responseString = [[NSString alloc] initWithData:responseObject encoding:[LDNetworkUtils stringEncodingWithRequest:request]];
+    }
+    
+    if (error) {
+        succeed = NO;
+        requestError = error;
+    } else if (serializationError) {
+        succeed = NO;
+        requestError = serializationError;
+    } else {
+        succeed = [self validateResult:request error:&validationError];
+        requestError = validationError;
+    }
+    
+    if (succeed) {
+        [self requestDidSucceedWithRequest:request];
+    } else {
+        [self requestDidFailWithRequest:request error:requestError];
+    }
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self removeRequestFromRecord:request];
+        [request clearCompletionBlock];
+    });
+
 }
 
 - (void)requestDidSucceedWithRequest:(LDBaseRequest *)request {
+    
+    [request requestCompleteFilter];
+    if ([request.delegate respondsToSelector:@selector(requestDidSuccess:)]) {
+        [request.delegate requestDidSuccess:request];
+    }
+    if (request.successCompletionBlock) {
+        request.successCompletionBlock(request);
+    }
 }
 
 - (void)requestDidFailWithRequest:(LDBaseRequest *)request error:(NSError *)error {
+    request.error = error;
+    
+    [request requestFailedFilter];
+    if ([request.delegate respondsToSelector:@selector(requestDidFailed:)]) {
+        [request.delegate requestDidFailed:request];
+    }
+    if (request.failureCompletionBlock) {
+        request.failureCompletionBlock(request);
+    }
 }
 
 - (void)addRequestToRecord:(LDBaseRequest *)request {
@@ -142,30 +251,6 @@ FOUNDATION_EXPORT void LDLog(NSString *format, ...) NS_FORMAT_FUNCTION(1,2);
 
 
 #pragma mark -
-
-- (NSURLSessionTask *)sessionTaskForRequest:(LDBaseRequest *)request error:(NSError * _Nullable __autoreleasing *)error {
-    LDRequestType type = [request requestType];
-    NSString *url = [self buildRequestUrl:request];
-    
-    id param = [request requestArgument];
-    if ([request.paramSource respondsToSelector:@selector(paramsForRequest:)] && !param) {
-        param = [request.paramSource paramsForRequest:request];
-    }
-
-    AFConstructingBlock constructingBlock = [request constructingBodyBlock];
-    AFHTTPRequestSerializer *requestSerializer = [self requestSerializerForRequest:request];
-    
-    switch (type) {
-        case LDRequestTypeGet:
-           return [self dataTaskWithHTTPMethod:@"GET" requestSerializer:requestSerializer URLString:url parameters:param error:error];
-        case LDRequestTypePost:
-            return [self dataTaskWithHTTPMethod:@"POST" requestSerializer:requestSerializer URLString:url parameters:param constructingBodyWithBlock:nil error:error];
-        case LDRequestTypeUpload:
-            return [self dataTaskWithHTTPMethod:@"POST" requestSerializer:requestSerializer URLString:url parameters:param constructingBodyWithBlock:constructingBlock error:error];
-        default:
-            break;
-    }
-}
 
 - (NSURLSessionDataTask *)dataTaskWithHTTPMethod:(NSString *)method
                                requestSerializer:(AFHTTPRequestSerializer *)requestSerializer

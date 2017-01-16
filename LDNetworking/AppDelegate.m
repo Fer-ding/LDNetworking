@@ -7,6 +7,7 @@
 //
 
 #import "AppDelegate.h"
+#import "LDNetworkConfig.h"
 
 @interface AppDelegate ()
 
@@ -17,6 +18,10 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    
+    LDNetworkConfig *config = [LDNetworkConfig sharedInstance];
+    config.debugLogEnabled = YES;
+    config.baseUrl = @"http://www.dummy.com";
     return YES;
 }
 

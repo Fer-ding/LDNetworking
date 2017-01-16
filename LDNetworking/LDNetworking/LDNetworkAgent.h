@@ -14,7 +14,7 @@
 
 + (LDNetworkAgent *)sharedInstance;
 
-- (void)addRequest:(YTKBaseRequest *)request;
+- (void)addRequest:(LDBaseRequest *)request;
 
 - (void)cancelRequest:(LDBaseRequest *)request;
 

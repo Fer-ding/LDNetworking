@@ -9,6 +9,7 @@
 #import "LDBaseRequest.h"
 #import "AFNetworking.h"
 #import "LDNetworkAgent.h"
+#import "LDNetworkConfig.h"
 
 @implementation LDBaseRequest
 
@@ -53,7 +54,49 @@
     return self.requestTask.state == NSURLSessionTaskStateRunning;
 }
 
+#pragma mark - Request Action
+
+- (void)loadData {
+    [[LDNetworkAgent sharedInstance] addRequest:self];
+}
+
+- (void)loadDataWithCompletionBlockWithSuccess:(LDRequestCompletionBlock)success failure:(LDRequestCompletionBlock)failure {
+    
+    [self setWithCompletionBlockWithSuccess:success failure:failure];
+    [self loadData];
+}
+
+- (void)setWithCompletionBlockWithSuccess:(LDRequestCompletionBlock)success failure:(LDRequestCompletionBlock)failure {
+    self.successCompletionBlock = success;
+    self.failureCompletionBlock = failure;
+}
+
+- (void)clearCompletionBlock {
+    // nil out to break the retain cycle.
+    self.successCompletionBlock = nil;
+    self.failureCompletionBlock = nil;
+}
+
+- (void)cancelAllRequests {
+    [[LDNetworkAgent sharedInstance] cancelAllRequests];
+}
+
+- (void)cancel {
+    self.delegate = nil;
+    self.paramSource = nil;
+    self.validator = nil;
+    [[LDNetworkAgent sharedInstance] cancelRequest:self];
+}
+
 #pragma mark - Subclass Override
+
+- (void)requestCompleteFilter {
+}
+
+- (void)requestFailedFilter {
+    
+}
+
 - (NSString *)requestUrl {
     return @"";
 }
@@ -102,39 +145,4 @@
 - (AFConstructingBlock)constructingBodyBlock {
     return nil;
 }
-
-#pragma mark - Request Action
-
-- (void)loadData {
-    [[LDNetworkAgent sharedInstance] addRequest:self];
-}
-
-- (void)loadDataWithCompletionBlockWithSuccess:(LDRequestCompletionBlock)success failure:(LDRequestCompletionBlock)failure {
-    
-    [self setWithCompletionBlockWithSuccess:success failure:failure];
-    [self loadData];
-}
-
-- (void)setWithCompletionBlockWithSuccess:(LDRequestCompletionBlock)success failure:(LDRequestCompletionBlock)failure {
-    self.successCompletionBlock = success;
-    self.failureCompletionBlock = failure;
-}
-
-- (void)clearCompletionBlock {
-    // nil out to break the retain cycle.
-    self.successCompletionBlock = nil;
-    self.failureCompletionBlock = nil;
-}
-
-- (void)cancelAllRequests {
-    [[LDNetworkAgent sharedInstance] cancelAllRequests];
-}
-
-- (void)cancel {
-    self.delegate = nil;
-    self.paramSource = nil;
-    self.validator = nil;
-    [[LDNetworkAgent sharedInstance] cancelRequest:self];
-}
-
 @end

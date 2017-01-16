@@ -48,7 +48,7 @@ typedef void(^LDRequestCompletionBlock)(__kindof LDBaseRequest *request);
 //api回调
 @protocol LDBaseRequestCallBackDelegate <NSObject>
 
-@required
+@optional
 - (void)requestDidSuccess:(LDBaseRequest *)request;
 - (void)requestDidFailed:(LDBaseRequest *)request;
 
@@ -78,17 +78,17 @@ typedef void(^LDRequestCompletionBlock)(__kindof LDBaseRequest *request);
 @property (nonatomic, copy) LDRequestCompletionBlock successCompletionBlock;
 @property (nonatomic, copy) LDRequestCompletionBlock failureCompletionBlock;
 
-@property (nonatomic, strong, readonly) NSURLSessionTask *requestTask;
+@property (nonatomic, strong) NSURLSessionTask *requestTask;
 @property (nonatomic, strong, readonly) NSURLRequest *currentRequest;
 @property (nonatomic, strong, readonly) NSURLRequest *originalRequest;
 @property (nonatomic, strong, readonly) NSHTTPURLResponse *response;
 @property (nonatomic, readonly) NSInteger responseStatusCode;
 @property (nonatomic, strong, readonly) NSDictionary *responseHeaders;
-@property (nonatomic, strong, readonly) NSData *responseData;
-@property (nonatomic, strong, readonly) NSString *responseString;
-@property (nonatomic, strong, readonly) id responseObject;
-@property (nonatomic, strong, readonly) id responseJSONObject;
-@property (nonatomic, strong, readonly) NSError *error;
+@property (nonatomic, strong) NSData *responseData;
+@property (nonatomic, strong) NSString *responseString;
+@property (nonatomic, strong) id responseObject;
+@property (nonatomic, strong) id responseJSONObject;
+@property (nonatomic, strong) NSError *error;
 @property (nonatomic, readonly, getter=isCancelled) BOOL cancelled;
 @property (nonatomic, readonly, getter=isExecuting) BOOL executing;
 
@@ -108,6 +108,12 @@ typedef void(^LDRequestCompletionBlock)(__kindof LDBaseRequest *request);
 - (void)cancel;
 
 /// 以下方法由子类继承来覆盖默认值
+
+///  Called on the main thread after request succeeded.
+- (void)requestCompleteFilter;
+
+///  Called on the main thread when request failed.
+- (void)requestFailedFilter;
 
 /// 请求的连接超时时间，默认为60秒
 - (NSTimeInterval)requestTimeoutInterval;
@@ -138,5 +144,4 @@ typedef void(^LDRequestCompletionBlock)(__kindof LDBaseRequest *request);
 
 // 是否允许使用蜂窝连接
 - (BOOL)allowsCellularAccess;
-
 @end
