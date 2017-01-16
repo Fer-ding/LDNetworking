@@ -8,6 +8,8 @@
 
 #import "ViewController.h"
 #import "RegisterApi.h"
+#import "UploadimageApi.h"
+#import "LDBatchRequest.h"
 
 @interface ViewController ()<LDBaseRequestCallBackDelegate,LDBaseRequestParamDelegate>
 
@@ -37,6 +39,27 @@
              @"username": @"yuehui",
              @"password": @"123456"
              };
+}
+
+/// Send batch request
+- (void)sendBatchRequest {
+    RegisterApi *a = [[RegisterApi alloc] init];
+    RegisterApi *b = [[RegisterApi alloc] init];
+    RegisterApi *c = [[RegisterApi alloc] init];
+    UploadimageApi *d = [[UploadimageApi alloc] init];
+    LDBatchRequest *batchRequest = [[LDBatchRequest alloc] initWithRequestArray:@[a, b, c, d]];
+    [batchRequest loadDataWithCompletionBlockWithSuccess:^(LDBatchRequest *batchRequest) {
+        NSLog(@"succeed");
+        NSArray *requests = batchRequest.requestArray;
+        RegisterApi *a = (RegisterApi *)requests[0];
+        RegisterApi *b = (RegisterApi *)requests[1];
+        RegisterApi *c = (RegisterApi *)requests[2];
+        UploadimageApi *user = (UploadimageApi *)requests[3];
+        // deal with requests result ...
+        NSLog(@"%@, %@, %@, %@", a, b, c, user);
+    } failure:^(LDBatchRequest *batchRequest) {
+        NSLog(@"failed");
+    }];
 }
 
 @end
