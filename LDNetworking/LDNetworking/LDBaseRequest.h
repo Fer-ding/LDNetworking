@@ -8,6 +8,13 @@
 
 #import <Foundation/Foundation.h>
 
+FOUNDATION_EXPORT NSString *const LDRequestValidationErrorDomain;
+
+NS_ENUM(NSInteger) {
+    LDRequestValidationErrorInvalidStatusCode = -8,
+    LDRequestValidationErrorInvalidJSONFormat = -9,
+    };
+
 typedef NS_ENUM(NSUInteger, LDRequestState) {
     LDRequestStateDefault,     //没有产生过API请求，这个是manager的默认状态。
     LDRequestStateSuccess,     //API请求成功且返回数据正确，此时manager的数据是可以直接拿来使用。
@@ -127,12 +134,6 @@ typedef void(^LDRequestCompletionBlock)(__kindof LDBaseRequest *request);
 /// Http请求的方法
 - (LDRequestType)requestType;
 
-///  Request serializer type.
-- (LDRequestSerializerType)requestSerializerType;
-
-///  Response serializer type. See also `responseObject`.
-- (LDResponseSerializerType)responseSerializerType;
-
 /// 请求的参数列表
 - (id)requestArgument;
 
@@ -144,4 +145,8 @@ typedef void(^LDRequestCompletionBlock)(__kindof LDBaseRequest *request);
 
 // 是否允许使用蜂窝连接
 - (BOOL)allowsCellularAccess;
+
+///  This validator will be used to test if `responseStatusCode` is valid.
+- (BOOL)statusCodeValidator;
+
 @end

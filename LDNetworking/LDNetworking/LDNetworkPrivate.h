@@ -18,6 +18,8 @@ FOUNDATION_EXPORT NSString *const LDRequestValidationErrorDomain;
 
 + (NSStringEncoding)stringEncodingWithRequest:(LDBaseRequest *)request;
 
++ (NSString *)md5StringFromString:(NSString *)string;
+
 @end
 
 @interface LDNetworkPrivate : LDBaseRequest

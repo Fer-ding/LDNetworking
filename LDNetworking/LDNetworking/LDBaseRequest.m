@@ -121,14 +121,6 @@
     return LDRequestTypeGet;
 }
 
-- (LDRequestSerializerType)requestSerializerType {
-    return LDRequestSerializerTypeHTTP;
-}
-
-- (LDResponseSerializerType)responseSerializerType {
-    return LDResponseSerializerTypeJSON;
-}
-
 - (NSDictionary *)requestHeaderFieldValueDictionary {
     return nil;
 }
@@ -137,12 +129,13 @@
     return YES;
 }
 
+- (AFConstructingBlock)constructingBodyBlock {
+    return nil;
+}
+
 - (BOOL)statusCodeValidator {
     NSInteger statusCode = [self responseStatusCode];
     return (statusCode >= 200 && statusCode <= 299);
 }
 
-- (AFConstructingBlock)constructingBodyBlock {
-    return nil;
-}
 @end

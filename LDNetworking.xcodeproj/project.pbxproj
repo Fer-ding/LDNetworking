@@ -27,6 +27,7 @@
 		58983F4A1E2CA9DB00F28C7D /* LDBatchRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 58983F491E2CA9DB00F28C7D /* LDBatchRequest.m */; };
 		58983F4D1E2CA9F200F28C7D /* LDBatchRequestAgent.m in Sources */ = {isa = PBXBuildFile; fileRef = 58983F4C1E2CA9F200F28C7D /* LDBatchRequestAgent.m */; };
 		58983F501E2CB7C100F28C7D /* UploadimageApi.m in Sources */ = {isa = PBXBuildFile; fileRef = 58983F4F1E2CB7C100F28C7D /* UploadimageApi.m */; };
+		58A391081E2DC45200B469D4 /* LDRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 58A391071E2DC45200B469D4 /* LDRequest.m */; };
 		5F27D3711E2A429100FCA30A /* LDNetworkConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 5F27D3701E2A429100FCA30A /* LDNetworkConfig.m */; };
 /* End PBXBuildFile section */
 
@@ -70,6 +71,9 @@
 		58983F4C1E2CA9F200F28C7D /* LDBatchRequestAgent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LDBatchRequestAgent.m; sourceTree = "<group>"; };
 		58983F4E1E2CB7C100F28C7D /* UploadimageApi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UploadimageApi.h; sourceTree = "<group>"; };
 		58983F4F1E2CB7C100F28C7D /* UploadimageApi.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UploadimageApi.m; sourceTree = "<group>"; };
+		58A391061E2DC45200B469D4 /* LDRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LDRequest.h; sourceTree = "<group>"; };
+		58A391071E2DC45200B469D4 /* LDRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LDRequest.m; sourceTree = "<group>"; };
+		58A3914D1E2E245B00B469D4 /* LDNetwork.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LDNetwork.h; sourceTree = "<group>"; };
 		5F27D36F1E2A429100FCA30A /* LDNetworkConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LDNetworkConfig.h; sourceTree = "<group>"; };
 		5F27D3701E2A429100FCA30A /* LDNetworkConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LDNetworkConfig.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -154,6 +158,7 @@
 		585B89031E232B1500651C4E /* LDNetworking */ = {
 			isa = PBXGroup;
 			children = (
+				58A3914D1E2E245B00B469D4 /* LDNetwork.h */,
 				587F03241E263F1800C8C5D7 /* LDBaseRequest.h */,
 				587F03251E263F1800C8C5D7 /* LDBaseRequest.m */,
 				58983F481E2CA9DB00F28C7D /* LDBatchRequest.h */,
@@ -168,6 +173,8 @@
 				58983F401E2C76E100F28C7D /* LDNetworkPrivate.m */,
 				58983F421E2C7B9700F28C7D /* LDUrlArgumentsFilter.h */,
 				58983F431E2C7B9700F28C7D /* LDUrlArgumentsFilter.m */,
+				58A391061E2DC45200B469D4 /* LDRequest.h */,
+				58A391071E2DC45200B469D4 /* LDRequest.m */,
 			);
 			path = LDNetworking;
 			sourceTree = "<group>";
@@ -244,6 +251,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				58A391081E2DC45200B469D4 /* LDRequest.m in Sources */,
 				585B89021E232ACF00651C4E /* AFURLSessionManager.m in Sources */,
 				587F03261E263F1800C8C5D7 /* LDBaseRequest.m in Sources */,
 				585B88E01E232ABD00651C4E /* ViewController.m in Sources */,

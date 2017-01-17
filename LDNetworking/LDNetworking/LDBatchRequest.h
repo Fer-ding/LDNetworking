@@ -7,8 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "LDRequest.h"
 
-@class LDBaseRequest;
 @class LDBatchRequest;
 
 //api回调
@@ -22,7 +22,7 @@
 
 @interface LDBatchRequest : NSObject
 
-@property (nonatomic, strong) NSArray<LDBaseRequest *> *requestArray;
+@property (nonatomic, strong) NSArray<LDRequest *> *requestArray;
 @property (nonatomic, weak) id<LDBatchRequestCallBackDelegate> delegate;
 @property (nonatomic, copy) void (^successCompletionBlock)(LDBatchRequest *);
 @property (nonatomic, copy) void (^failureCompletionBlock)(LDBatchRequest *);
@@ -41,5 +41,8 @@
 
 //取消网络请求
 - (void)cancel;
+
+///  Whether all response data is from local cache.
+- (BOOL)isDataFromCache;
 
 @end

@@ -14,6 +14,7 @@
 @implementation LDNetworkAgent {
     AFHTTPSessionManager *_manager;
     LDNetworkConfig *_config;
+    AFJSONResponseSerializer *_jsonResponseSerializer;
     NSMutableDictionary<NSNumber *, LDBaseRequest *> *_requestsRecord;
 }
 
@@ -38,6 +39,13 @@
     _requestsRecord = [NSMutableDictionary dictionary];
     
     return self;
+}
+
+- (AFJSONResponseSerializer *)jsonResponseSerializer {
+    if (!_jsonResponseSerializer) {
+        _jsonResponseSerializer = [AFJSONResponseSerializer serializer];
+    }
+    return _jsonResponseSerializer;
 }
 
 #pragma mark - 
@@ -74,12 +82,7 @@
 }
 
 - (AFHTTPRequestSerializer *)requestSerializerForRequest:(LDBaseRequest *)request {
-    AFHTTPRequestSerializer *requestSerializer = nil;
-    if (request.requestSerializerType == LDRequestSerializerTypeHTTP) {
-        requestSerializer = [AFHTTPRequestSerializer serializer];
-    } else if (request.requestSerializerType == LDRequestSerializerTypeJSON) {
-        requestSerializer = [AFJSONRequestSerializer serializer];
-    }
+    AFHTTPRequestSerializer *requestSerializer = [AFHTTPRequestSerializer serializer];;
     
     requestSerializer.timeoutInterval = [request requestTimeoutInterval];
     requestSerializer.allowsCellularAccess = [request allowsCellularAccess];
@@ -156,15 +159,23 @@
 }
 
 - (BOOL)validateResult:(LDBaseRequest *)request error:(NSError * _Nullable __autoreleasing *)error {
-//    BOOL result = [request statusCodeValidator];
-//    if (!result) {
-//        if (error) {
-//            *error = [NSError errorWithDomain:LDRequestValidationErrorDomain code:LDRequestValidationErrorInvalidStatusCode userInfo:@{NSLocalizedDescriptionKey:@"Invalid status code"}];
-//        }
-//        return result;
-//    }
+    
+    BOOL result = [request statusCodeValidator];
+    if (!result) {
+        if (error) {
+            *error = [NSError errorWithDomain:LDRequestValidationErrorDomain code:LDRequestValidationErrorInvalidStatusCode userInfo:@{NSLocalizedDescriptionKey:@"Invalid status code"}];
+        }
+        return result;
+    }
+    
     if ([request.validator respondsToSelector:@selector(request:isCorrectWithResponseData:)]) {
-        return [request.validator request:request isCorrectWithResponseData:request.responseObject];
+        result = [request.validator request:request isCorrectWithResponseData:request.responseJSONObject];
+        if (!result) {
+            if (error) {
+                *error = [NSError errorWithDomain:LDRequestValidationErrorDomain code:LDRequestValidationErrorInvalidJSONFormat userInfo:@{NSLocalizedDescriptionKey:@"Invalid JSON format"}];
+            }
+            return result;
+        }
     }
     return YES;
 }
@@ -187,6 +198,9 @@
     if ([request.responseObject isKindOfClass:[NSData class]]) {
         request.responseData = responseObject;
         request.responseString = [[NSString alloc] initWithData:responseObject encoding:[LDNetworkUtils stringEncodingWithRequest:request]];
+        
+        request.responseObject = [self.jsonResponseSerializer responseObjectForResponse:task.response data:request.responseData error:&serializationError];
+        request.responseJSONObject = request.responseObject;
     }
     
     if (error) {
@@ -196,7 +210,7 @@
         succeed = NO;
         requestError = serializationError;
     } else {
-        succeed = [self validateResult:request error:&validationError];
+        succeed = [self request:request isCorrectWithResponseData:request.responseJSONObject];
         requestError = validationError;
     }
     
@@ -226,6 +240,8 @@
 
 - (void)requestDidFailWithRequest:(LDBaseRequest *)request error:(NSError *)error {
     request.error = error;
+    LDLog(@"Request %@ failed, status code = %ld, error = %@",
+           NSStringFromClass([request class]), (long)request.responseStatusCode, error.localizedDescription);
     
     [request requestFailedFilter];
     if ([request.delegate respondsToSelector:@selector(requestDidFailed:)]) {
@@ -248,7 +264,6 @@
         LDLog(@"Request queue size = %zd", [_requestsRecord count]);
     }
 }
-
 
 #pragma mark -
 
@@ -281,6 +296,25 @@
                            }];
     
     return dataTask;
+}
+
+#pragma mark -- 验证器(validator)方法
+- (BOOL)request:(LDBaseRequest *)request isCorrectWithParamsData:(NSDictionary *)data {
+    
+    if ([request.validator respondsToSelector:@selector(request:isCorrectWithParamsData:)]) {
+        return [request.validator request:request isCorrectWithParamsData:data];
+    }else{
+        return YES;
+    }
+}
+
+- (BOOL)request:(LDBaseRequest *)request isCorrectWithResponseData:(NSDictionary *)data {
+    
+    if ([request.validator respondsToSelector:@selector(request:isCorrectWithResponseData:)]) {
+        return [request.validator request:request isCorrectWithResponseData:data];
+    }else{
+        return YES;
+    }
 }
 
 @end

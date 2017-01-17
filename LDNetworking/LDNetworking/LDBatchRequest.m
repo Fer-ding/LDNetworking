@@ -28,8 +28,8 @@
     if (self) {
         _requestArray = [requestArray copy];
         _finishedCount = 0;
-        for (LDBaseRequest * req in _requestArray) {
-            if (![req isKindOfClass:[LDBaseRequest class]]) {
+        for (LDRequest * req in _requestArray) {
+            if (![req isKindOfClass:[LDRequest class]]) {
                 LDLog(@"Error, request item must be LDRequest instance.");
                 return nil;
             }
@@ -45,7 +45,7 @@
     }
     _failedRequest = nil;
     [[LDBatchRequestAgent sharedInstance] addBatchRequest:self];
-    for (LDBaseRequest * req in _requestArray) {
+    for (LDRequest * req in _requestArray) {
         req.delegate = self;
         [req clearCompletionBlock];
         [req loadData];
@@ -75,9 +75,19 @@
     self.failureCompletionBlock = nil;
 }
 
+- (BOOL)isDataFromCache {
+    BOOL result = YES;
+    for (LDRequest *request in _requestArray) {
+        if (!request.isDataFromCache) {
+            result = NO;
+        }
+    }
+    return result;
+}
+
 #pragma mark - Network Request Delegate
 
-- (void)requestDidSuccess:(LDBaseRequest *)request {
+- (void)requestDidSuccess:(LDRequest *)request {
     _finishedCount++;
     if (_finishedCount == _requestArray.count) {
         if ([_delegate respondsToSelector:@selector(batchRequestDidSuccess:)]) {
@@ -91,11 +101,11 @@
     }
 }
 
-- (void)requestDidFailed:(LDBaseRequest *)request {
+- (void)requestDidFailed:(LDRequest *)request {
     _failedRequest = request;
     
     // Cancel
-    for (LDBaseRequest *req in _requestArray) {
+    for (LDRequest *req in _requestArray) {
         [req cancel];
     }
     
@@ -113,7 +123,7 @@
 }
 
 - (void)clearRequest {
-    for (LDBaseRequest * req in _requestArray) {
+    for (LDRequest * req in _requestArray) {
         [req cancel];
     }
     [self clearCompletionBlock];
