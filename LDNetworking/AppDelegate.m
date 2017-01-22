@@ -21,7 +21,7 @@
     
     LDNetworkConfig *config = [LDNetworkConfig sharedInstance];
     config.debugLogEnabled = YES;
-    config.baseUrl = @"http://www.dummy.com";
+    config.baseUrl = @"http://app.tt.oolagongyi.com/v1";
     return YES;
 }
 

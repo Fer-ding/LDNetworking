@@ -10,8 +10,6 @@
 #import "LDBaseRequest.h"
 
 FOUNDATION_EXPORT void LDLog(NSString *format, ...) NS_FORMAT_FUNCTION(1,2);
-FOUNDATION_EXPORT NSString *const LDRequestValidationErrorDomain;
-
 
 
 @interface LDNetworkUtils : NSObject
@@ -22,14 +20,4 @@ FOUNDATION_EXPORT NSString *const LDRequestValidationErrorDomain;
 
 @end
 
-@interface LDNetworkPrivate : LDBaseRequest
 
-- (NSError *)convertError:(NSError *)error;
-
-@end
-
-@interface LDBaseRequest (Errorhandle)
-
-- (void)requestDidFailedForError:(NSError *)error;
-
-@end

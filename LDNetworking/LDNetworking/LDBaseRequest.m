@@ -11,6 +11,8 @@
 #import "LDNetworkAgent.h"
 #import "LDNetworkConfig.h"
 
+NSString *const LDRequestErrorDomain = @"com.leapDing.request.error";
+
 @implementation LDBaseRequest
 
 #pragma mark - life cycle
@@ -84,7 +86,6 @@
 - (void)cancel {
     self.delegate = nil;
     self.paramSource = nil;
-    self.validator = nil;
     [[LDNetworkAgent sharedInstance] cancelRequest:self];
 }
 
@@ -94,14 +95,9 @@
 }
 
 - (void)requestFailedFilter {
-    
 }
 
 - (NSString *)requestUrl {
-    return @"";
-}
-
-- (NSString *)cdnUrl {
     return @"";
 }
 
@@ -111,10 +107,6 @@
 
 - (NSTimeInterval)requestTimeoutInterval {
     return 60;
-}
-
-- (id)requestArgument {
-    return nil;
 }
 
 - (LDRequestType)requestType {

@@ -8,9 +8,7 @@
 
 #import "LDNetworkConfig.h"
 
-@implementation LDNetworkConfig {
-    NSMutableArray<id<LDUrlFilterProtocol>> *_urlFilters;
-}
+@implementation LDNetworkConfig
 
 + (LDNetworkConfig *)sharedInstance {
     static id sharedInstance = nil;
@@ -25,16 +23,9 @@
     self = [super init];
     if (self) {
         _baseUrl = @"";
+        _debugLogEnabled = NO;
     }
     return self;
-}
-
-- (void)addUrlFilter:(id<LDUrlFilterProtocol>)filter {
-    [_urlFilters addObject:filter];
-}
-
-- (void)clearUrlFilter {
-    [_urlFilters removeAllObjects];
 }
 
 @end

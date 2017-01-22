@@ -38,19 +38,6 @@ NSString *const LDRequestValidationErrorDomain = @"com.leihouya.request.validati
     return stringEncoding;
 }
 
-@end
-
-@implementation LDNetworkPrivate
-
-- (NSError *)convertError:(NSError *)error {
-    
-    NSInteger errorCode = LDRequestStateNoNetWork;
-    if (error.code == NSURLErrorTimedOut) {
-        errorCode = LDRequestStateTimeout;
-    }
-    return [NSError errorWithDomain:LDRequestValidationErrorDomain code:errorCode userInfo:error.userInfo];
-}
-
 + (NSString *)md5StringFromString:(NSString *)string {
     if(string == nil || [string length] == 0)
         return nil;

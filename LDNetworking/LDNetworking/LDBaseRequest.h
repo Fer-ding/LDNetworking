@@ -12,37 +12,13 @@ FOUNDATION_EXPORT NSString *const LDRequestValidationErrorDomain;
 
 NS_ENUM(NSInteger) {
     LDRequestValidationErrorInvalidStatusCode = -8,
-    LDRequestValidationErrorInvalidJSONFormat = -9,
+    LDRequestValidationErrorRequestFailed = -9,
     };
-
-typedef NS_ENUM(NSUInteger, LDRequestState) {
-    LDRequestStateDefault,     //没有产生过API请求，这个是manager的默认状态。
-    LDRequestStateSuccess,     //API请求成功且返回数据正确，此时manager的数据是可以直接拿来使用。
-    LDRequestStateContentError,   //API请求成功但返回数据不正确，如果回调数据验证函数返回值为NO，manager的状态就会是这个。
-    LDRequestStateNetError,    //API请求返回失败。
-    LDRequestStateParamsError, //参数错误，此时manager不会调用API，因为参数验证是在调用API之前做的。
-    LDRequestStateTimeout,     //请求超时。具体超时时间的设置根据不同需求而有所差别。
-    LDRequestStateNoNetWork    //网络不通。在调用API之前会判断一下当前网络是否通畅，这个也是在调用API之前验证的，和上面超时的状态是有区别的。
-};
 
 typedef NS_ENUM(NSUInteger, LDRequestType) {
     LDRequestTypeGet,
     LDRequestTypePost,
     LDRequestTypeUpload      //上传文件
-};
-
-///  Request serializer type.
-typedef NS_ENUM(NSInteger, LDRequestSerializerType) {
-    LDRequestSerializerTypeHTTP = 0,
-    LDRequestSerializerTypeJSON,
-};
-
-///  Response serializer type.
-typedef NS_ENUM(NSInteger, LDResponseSerializerType) {
-    /// NSData type
-    LDResponseSerializerTypeHTTP,
-    /// JSON object type
-    LDResponseSerializerTypeJSON,
 };
 
 @protocol AFMultipartFormData;
@@ -61,12 +37,12 @@ typedef void(^LDRequestCompletionBlock)(__kindof LDBaseRequest *request);
 
 @end
 
-#pragma mark -- 获取调用API所需要的参数
+#pragma mark - 获取调用API所需要的参数
 @protocol LDBaseRequestParamDelegate <NSObject>
 @required
 - (NSDictionary *)paramsForRequest:(LDBaseRequest *)request;
 @end
-
+    
 #pragma mark -- 验证器，用于验证API的返回或者调用API的参数是否正确
 @protocol LDBaseRequestValidator <NSObject>
 @optional
@@ -76,11 +52,17 @@ typedef void(^LDRequestCompletionBlock)(__kindof LDBaseRequest *request);
 - (BOOL)request:(LDBaseRequest *)request isCorrectWithParamsData:(NSDictionary *)data;
 @end
 
+
+#pragma mark - 负责重新组装API数据的对象
+@protocol LDBaseRequestDataReformer <NSObject>
+- (id)request:(LDBaseRequest *)request reformData:(NSDictionary *)data;
+@end
+
 @interface LDBaseRequest : NSObject
 
 @property (nonatomic, weak) id<LDBaseRequestParamDelegate> paramSource;
 @property (nonatomic, weak) id<LDBaseRequestCallBackDelegate> delegate;
-@property (nonatomic, weak) id<LDBaseRequestValidator> validator;
+@property (nonatomic, weak) id<LDBaseRequestValidator> validator; //!<验证器
 
 @property (nonatomic, copy) LDRequestCompletionBlock successCompletionBlock;
 @property (nonatomic, copy) LDRequestCompletionBlock failureCompletionBlock;
@@ -114,7 +96,10 @@ typedef void(^LDRequestCompletionBlock)(__kindof LDBaseRequest *request);
 //取消网络请求
 - (void)cancel;
 
-/// 以下方法由子类继承来覆盖默认值
+#pragma mark - Subclass Override
+
+/// 请求的URL
+- (NSString *)requestUrl;
 
 ///  Called on the main thread after request succeeded.
 - (void)requestCompleteFilter;
@@ -125,17 +110,11 @@ typedef void(^LDRequestCompletionBlock)(__kindof LDBaseRequest *request);
 /// 请求的连接超时时间，默认为60秒
 - (NSTimeInterval)requestTimeoutInterval;
 
-/// 请求的URL
-- (NSString *)requestUrl;
-
 /// 请求的BaseURL
 - (NSString *)baseUrl;
 
 /// Http请求的方法
 - (LDRequestType)requestType;
-
-/// 请求的参数列表
-- (id)requestArgument;
 
 /// 在HTTP报头添加的自定义参数
 - (NSDictionary *)requestHeaderFieldValueDictionary;

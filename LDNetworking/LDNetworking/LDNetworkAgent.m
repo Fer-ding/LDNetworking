@@ -10,11 +10,13 @@
 #import "AFNetworking.h"
 #import "LDNetworkConfig.h"
 #import "LDNetworkPrivate.h"
+#import "LDSignatureGenerator.h"
+#import "LDResponseErrorHandler.h"
+#import "MBProgressHUD+PKX.h"
 
 @implementation LDNetworkAgent {
     AFHTTPSessionManager *_manager;
     LDNetworkConfig *_config;
-    AFJSONResponseSerializer *_jsonResponseSerializer;
     NSMutableDictionary<NSNumber *, LDBaseRequest *> *_requestsRecord;
 }
 
@@ -35,17 +37,11 @@
     }
     _config = [LDNetworkConfig sharedInstance];
     _manager = [AFHTTPSessionManager manager];
-    _manager.responseSerializer = [AFHTTPResponseSerializer serializer];
+    _manager.responseSerializer = [AFJSONResponseSerializer serializer];
+    _manager.responseSerializer.acceptableContentTypes = [NSSet setWithObjects:@"application/json", @"text/html", @"text/json", @"text/javascript",@"text/plain", nil];
     _requestsRecord = [NSMutableDictionary dictionary];
     
     return self;
-}
-
-- (AFJSONResponseSerializer *)jsonResponseSerializer {
-    if (!_jsonResponseSerializer) {
-        _jsonResponseSerializer = [AFJSONResponseSerializer serializer];
-    }
-    return _jsonResponseSerializer;
 }
 
 #pragma mark - 
@@ -56,12 +52,6 @@
     // If detailUrl is valid URL。scheme==http或https，host==www.baidu.com。
     if (temp && temp.scheme && temp.host) {
         return detailUrl;
-    }
-    
-    // Filter URL if needed
-    NSArray *filters = [_config urlFilters];
-    for (id<LDUrlFilterProtocol> f in filters) {
-        detailUrl = [f filterUrl:detailUrl withRequest:request];
     }
     
     NSString *baseUrl;
@@ -102,10 +92,12 @@
     LDRequestType type = [request requestType];
     NSString *url = [self buildRequestUrl:request];
     
-    id param = [request requestArgument];
-    if ([request.paramSource respondsToSelector:@selector(paramsForRequest:)] && !param) {
+    id param = nil;
+    if ([request.paramSource respondsToSelector:@selector(paramsForRequest:)]) {
         param = [request.paramSource paramsForRequest:request];
     }
+#warning 如果有加密需求，可以在这个类里设置公共的一些加密字段及value
+    param = [LDSignatureGenerator ldUrlParamsSignForDictionary:param];
     
     AFConstructingBlock constructingBlock = [request constructingBodyBlock];
     AFHTTPRequestSerializer *requestSerializer = [self requestSerializerForRequest:request];
@@ -168,14 +160,13 @@
         return result;
     }
     
-    if ([request.validator respondsToSelector:@selector(request:isCorrectWithResponseData:)]) {
-        result = [request.validator request:request isCorrectWithResponseData:request.responseJSONObject];
-        if (!result) {
-            if (error) {
-                *error = [NSError errorWithDomain:LDRequestValidationErrorDomain code:LDRequestValidationErrorInvalidJSONFormat userInfo:@{NSLocalizedDescriptionKey:@"Invalid JSON format"}];
-            }
-            return result;
+    result = [self request:request isCorrectWithResponseData:request.responseJSONObject];
+    
+    if (!result) {
+        if (error) {
+            *error = [NSError errorWithDomain:LDRequestValidationErrorDomain code:LDRequestValidationErrorInvalidStatusCode userInfo:@{NSLocalizedDescriptionKey:@"Request failed"}];
         }
+        return result;
     }
     return YES;
 }
@@ -199,7 +190,7 @@
         request.responseData = responseObject;
         request.responseString = [[NSString alloc] initWithData:responseObject encoding:[LDNetworkUtils stringEncodingWithRequest:request]];
         
-        request.responseObject = [self.jsonResponseSerializer responseObjectForResponse:task.response data:request.responseData error:&serializationError];
+        request.responseObject = [[AFJSONResponseSerializer serializer] responseObjectForResponse:task.response data:request.responseData error:&serializationError];
         request.responseJSONObject = request.responseObject;
     }
     
@@ -240,6 +231,9 @@
 
 - (void)requestDidFailWithRequest:(LDBaseRequest *)request error:(NSError *)error {
     request.error = error;
+    [LDResponseErrorHandler errorHandlerWithRequest:request errorHandler:^(NSError *newError) {
+        [self errorAlertRequestResult:request];
+    }];
     LDLog(@"Request %@ failed, status code = %ld, error = %@",
            NSStringFromClass([request class]), (long)request.responseStatusCode, error.localizedDescription);
     
@@ -249,6 +243,13 @@
     }
     if (request.failureCompletionBlock) {
         request.failureCompletionBlock(request);
+    }
+}
+
+- (void)errorAlertRequestResult:(LDBaseRequest *)request {
+    //可以在这里做错误的UI处理，或者是在上层Request做
+    if (request.error.code == LDResponseErrorTypeNoNetWork || request.error.code == LDResponseErrorTypeTimeout) {
+        [MBProgressHUD showError:request.error.userInfo[NSLocalizedDescriptionKey]];
     }
 }
 
@@ -310,11 +311,18 @@
 
 - (BOOL)request:(LDBaseRequest *)request isCorrectWithResponseData:(NSDictionary *)data {
     
-    if ([request.validator respondsToSelector:@selector(request:isCorrectWithResponseData:)]) {
-        return [request.validator request:request isCorrectWithResponseData:data];
-    }else{
-        return YES;
+    __block BOOL result = YES;
+    [LDResponseErrorHandler errorHandlerWithRequest:request errorHandler:^(NSError *newError) {
+        if (newError != nil) {
+            result = NO;
+            [self errorAlertRequestResult:request];
+        }
+    }];
+    if ([request.validator respondsToSelector:@selector(request:isCorrectWithResponseData:)] && result) {
+        result = [request.validator request:request isCorrectWithResponseData:data];
     }
+    
+    return result;
 }
 
 @end
