@@ -57,4 +57,13 @@
 //    }];
 //}
 
+#pragma mark - LDBaseRequestCallBackDelegate
+- (void)requestDidSuccess:(LDBaseRequest *)request {
+    
+}
+
+- (void)requestDidFailed:(LDBaseRequest *)request {
+    
+}
+
 @end

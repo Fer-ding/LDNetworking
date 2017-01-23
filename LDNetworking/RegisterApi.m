@@ -24,6 +24,10 @@
     [self loadData];
 }
 
+- (LDRequestType)requestType {
+    return LDRequestTypePost;
+}
+
 - (NSInteger)cacheTimeInSeconds {
     return 60 * 3;
 }
