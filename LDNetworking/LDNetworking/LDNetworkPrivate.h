@@ -12,9 +12,11 @@
 FOUNDATION_EXPORT void LDLog(NSString *format, ...) NS_FORMAT_FUNCTION(1,2);
 
 
-@interface LDNetworkUtils : NSObject
+@interface LDNetworkPrivate : NSObject
 
 + (NSStringEncoding)stringEncodingWithRequest:(LDBaseRequest *)request;
+
++ (void)addDoNotBackupAttribute:(NSString *)path;
 
 + (NSString *)md5StringFromString:(NSString *)string;
 

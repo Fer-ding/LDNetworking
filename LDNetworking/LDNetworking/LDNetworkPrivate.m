@@ -24,7 +24,7 @@ void LDLog(NSString *format, ...) {
 
 NSString *const LDRequestValidationErrorDomain = @"com.leihouya.request.validation";
 
-@implementation LDNetworkUtils
+@implementation LDNetworkPrivate
 
 + (NSStringEncoding)stringEncodingWithRequest:(LDBaseRequest *)request {
     // From AFNetworking 2.6.3
@@ -53,6 +53,15 @@ NSString *const LDRequestValidationErrorDomain = @"com.leihouya.request.validati
     }
     
     return outputString;
+}
+
++ (void)addDoNotBackupAttribute:(NSString *)path {
+    NSURL *url = [NSURL fileURLWithPath:path];
+    NSError *error = nil;
+    [url setResourceValue:[NSNumber numberWithBool:YES] forKey:NSURLIsExcludedFromBackupKey error:&error];
+    if (error) {
+        LDLog(@"error to set do not backup attribute, error = %@", error);
+    }
 }
 
 @end

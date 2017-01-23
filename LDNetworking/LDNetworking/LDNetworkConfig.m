@@ -8,7 +8,9 @@
 
 #import "LDNetworkConfig.h"
 
-@implementation LDNetworkConfig
+@implementation LDNetworkConfig {
+    NSMutableArray *_cacheDirPathFilters;
+}
 
 + (LDNetworkConfig *)sharedInstance {
     static id sharedInstance = nil;
@@ -24,8 +26,17 @@
     if (self) {
         _baseUrl = @"";
         _debugLogEnabled = NO;
+        _cacheDirPathFilters = [NSMutableArray array];
     }
     return self;
+}
+
+- (void)addCacheDirPathFilter:(id<LDCacheDirPathFilterProtocol>)filter {
+    [_cacheDirPathFilters addObject:filter];
+}
+
+- (NSArray *)cacheDirPathFilters {
+    return [_cacheDirPathFilters copy];
 }
 
 @end

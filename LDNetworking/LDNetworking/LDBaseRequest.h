@@ -36,12 +36,6 @@ typedef void(^LDRequestCompletionBlock)(__kindof LDBaseRequest *request);
 - (void)requestDidFailed:(LDBaseRequest *)request;
 
 @end
-
-#pragma mark - 获取调用API所需要的参数
-@protocol LDBaseRequestParamDelegate <NSObject>
-@required
-- (NSDictionary *)paramsForRequest:(LDBaseRequest *)request;
-@end
     
 #pragma mark -- 验证器，用于验证API的返回或者调用API的参数是否正确
 @protocol LDBaseRequestValidator <NSObject>
@@ -60,7 +54,6 @@ typedef void(^LDRequestCompletionBlock)(__kindof LDBaseRequest *request);
 
 @interface LDBaseRequest : NSObject
 
-@property (nonatomic, weak) id<LDBaseRequestParamDelegate> paramSource;
 @property (nonatomic, weak) id<LDBaseRequestCallBackDelegate> delegate;
 @property (nonatomic, weak) id<LDBaseRequestValidator> validator; //!<验证器
 
@@ -115,6 +108,12 @@ typedef void(^LDRequestCompletionBlock)(__kindof LDBaseRequest *request);
 
 /// Http请求的方法
 - (LDRequestType)requestType;
+
+///  Additional request argument.
+- (id)requestArgument;
+
+/// 用于在cache结果，计算cache文件名时，忽略掉一些指定的参数
+- (id)cacheFileNameFilterForRequestArgument:(id)argument;
 
 /// 在HTTP报头添加的自定义参数
 - (NSDictionary *)requestHeaderFieldValueDictionary;

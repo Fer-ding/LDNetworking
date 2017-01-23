@@ -8,6 +8,8 @@
 
 #import "LDBaseRequest.h"
 
-@interface testApi : LDBaseRequest 
+@interface testApi : LDBaseRequest
+
+- (void)loadDataWithUserName:(NSString *)username pwd:(NSString *)pwd;
 
 @end

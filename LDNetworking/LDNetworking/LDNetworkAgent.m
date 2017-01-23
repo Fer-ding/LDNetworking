@@ -92,10 +92,8 @@
     LDRequestType type = [request requestType];
     NSString *url = [self buildRequestUrl:request];
     
-    id param = nil;
-    if ([request.paramSource respondsToSelector:@selector(paramsForRequest:)]) {
-        param = [request.paramSource paramsForRequest:request];
-    }
+    id param = [request requestArgument];
+    
 #warning 如果有加密需求，可以在这个类里设置公共的一些加密字段及value
     param = [LDSignatureGenerator ldUrlParamsSignForDictionary:param];
     
@@ -188,7 +186,7 @@
     request.responseObject = responseObject;
     if ([request.responseObject isKindOfClass:[NSData class]]) {
         request.responseData = responseObject;
-        request.responseString = [[NSString alloc] initWithData:responseObject encoding:[LDNetworkUtils stringEncodingWithRequest:request]];
+        request.responseString = [[NSString alloc] initWithData:responseObject encoding:[LDNetworkPrivate stringEncodingWithRequest:request]];
         
         request.responseObject = [[AFJSONResponseSerializer serializer] responseObjectForResponse:task.response data:request.responseData error:&serializationError];
         request.responseJSONObject = request.responseObject;

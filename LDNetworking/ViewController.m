@@ -12,7 +12,7 @@
 #import "LDBatchRequest.h"
 #import "testApi.h"
 
-@interface ViewController ()<LDBaseRequestCallBackDelegate,LDBaseRequestParamDelegate>
+@interface ViewController ()<LDBaseRequestCallBackDelegate>
 
 @end
 
@@ -29,7 +29,7 @@
 //    [api loadData];
     
     testApi *testApi2 = [[testApi alloc] init];
-    [testApi2 loadData];
+    [testApi2 loadDataWithUserName:@"huige" pwd:@"123456"];
 }
 
 
@@ -38,15 +38,6 @@
     // Dispose of any resources that can be recreated.
 }
 
-- (NSDictionary *)paramsForRequest:(LDBaseRequest *)request {
-    if ([request isKindOfClass:[RegisterApi class]]) {
-        return @{
-                 @"username": @"yuehui",
-                 @"password": @"123456"
-                 };
-    }
-    return nil;
-}
 
 ///// Send batch request
 //- (void)sendBatchRequest {

@@ -42,6 +42,10 @@ NSString *const LDRequestErrorDomain = @"com.leapDing.request.error";
     return self.requestTask.originalRequest;
 }
 
+- (NSDictionary *)params {
+    return nil;
+}
+
 - (BOOL)isCancelled {
     if (!self.requestTask) {
         return NO;
@@ -85,7 +89,6 @@ NSString *const LDRequestErrorDomain = @"com.leapDing.request.error";
 
 - (void)cancel {
     self.delegate = nil;
-    self.paramSource = nil;
     [[LDNetworkAgent sharedInstance] cancelRequest:self];
 }
 
@@ -103,6 +106,14 @@ NSString *const LDRequestErrorDomain = @"com.leapDing.request.error";
 
 - (NSString *)baseUrl {
     return @"";
+}
+
+- (id)requestArgument {
+    return nil;
+}
+
+- (id)cacheFileNameFilterForRequestArgument:(id)argument {
+    return argument;
 }
 
 - (NSTimeInterval)requestTimeoutInterval {
