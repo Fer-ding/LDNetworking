@@ -8,6 +8,7 @@
 
 #import "LDBaseRequest.h"
 
+/// 这个类实现了缓存，也是给使用者来继承的接口类
 @interface LDRequest : LDBaseRequest
 
 /// 选择是否忽视cache, Default use cache.

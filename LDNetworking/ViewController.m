@@ -10,7 +10,6 @@
 #import "RegisterApi.h"
 #import "UploadimageApi.h"
 #import "LDBatchRequest.h"
-#import "testApi.h"
 
 @interface ViewController ()<LDBaseRequestCallBackDelegate>
 
@@ -22,14 +21,12 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     
-//    RegisterApi *api = [[RegisterApi alloc] init];
-//    api.delegate = self;
-//    api.paramSource = self;
+    RegisterApi *api = [[RegisterApi alloc] init];
+    api.delegate = self;
+   [api loadDataWithUserName:@"huige" pwd:@"123456"];
     
 //    [api loadData];
     
-    testApi *testApi2 = [[testApi alloc] init];
-    [testApi2 loadDataWithUserName:@"huige" pwd:@"123456"];
 }
 
 

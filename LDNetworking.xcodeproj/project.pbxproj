@@ -21,9 +21,8 @@
 		585B89021E232ACF00651C4E /* AFURLSessionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 585B88FC1E232ACF00651C4E /* AFURLSessionManager.m */; };
 		587F03221E263F0C00C8C5D7 /* LDNetworkAgent.m in Sources */ = {isa = PBXBuildFile; fileRef = 587F031F1E263F0C00C8C5D7 /* LDNetworkAgent.m */; };
 		587F03261E263F1800C8C5D7 /* LDBaseRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 587F03251E263F1800C8C5D7 /* LDBaseRequest.m */; };
-		588742DD1E2F466F00FF58FF /* testApi.m in Sources */ = {isa = PBXBuildFile; fileRef = 588742DC1E2F466F00FF58FF /* testApi.m */; };
+		588742DD1E2F466F00FF58FF /* RegisterApi.m in Sources */ = {isa = PBXBuildFile; fileRef = 588742DC1E2F466F00FF58FF /* RegisterApi.m */; };
 		58983F411E2C76E100F28C7D /* LDNetworkPrivate.m in Sources */ = {isa = PBXBuildFile; fileRef = 58983F401E2C76E100F28C7D /* LDNetworkPrivate.m */; };
-		58983F471E2CA51000F28C7D /* RegisterApi.m in Sources */ = {isa = PBXBuildFile; fileRef = 58983F461E2CA51000F28C7D /* RegisterApi.m */; };
 		58983F4A1E2CA9DB00F28C7D /* LDBatchRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 58983F491E2CA9DB00F28C7D /* LDBatchRequest.m */; };
 		58983F4D1E2CA9F200F28C7D /* LDBatchRequestAgent.m in Sources */ = {isa = PBXBuildFile; fileRef = 58983F4C1E2CA9F200F28C7D /* LDBatchRequestAgent.m */; };
 		58983F501E2CB7C100F28C7D /* UploadimageApi.m in Sources */ = {isa = PBXBuildFile; fileRef = 58983F4F1E2CB7C100F28C7D /* UploadimageApi.m */; };
@@ -65,12 +64,10 @@
 		587F031F1E263F0C00C8C5D7 /* LDNetworkAgent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LDNetworkAgent.m; sourceTree = "<group>"; };
 		587F03241E263F1800C8C5D7 /* LDBaseRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LDBaseRequest.h; sourceTree = "<group>"; };
 		587F03251E263F1800C8C5D7 /* LDBaseRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LDBaseRequest.m; sourceTree = "<group>"; };
-		588742DB1E2F466F00FF58FF /* testApi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = testApi.h; sourceTree = "<group>"; };
-		588742DC1E2F466F00FF58FF /* testApi.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = testApi.m; sourceTree = "<group>"; };
+		588742DB1E2F466F00FF58FF /* RegisterApi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RegisterApi.h; sourceTree = "<group>"; };
+		588742DC1E2F466F00FF58FF /* RegisterApi.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RegisterApi.m; sourceTree = "<group>"; };
 		58983F3F1E2C76E100F28C7D /* LDNetworkPrivate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LDNetworkPrivate.h; sourceTree = "<group>"; };
 		58983F401E2C76E100F28C7D /* LDNetworkPrivate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LDNetworkPrivate.m; sourceTree = "<group>"; };
-		58983F451E2CA51000F28C7D /* RegisterApi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RegisterApi.h; sourceTree = "<group>"; };
-		58983F461E2CA51000F28C7D /* RegisterApi.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RegisterApi.m; sourceTree = "<group>"; };
 		58983F481E2CA9DB00F28C7D /* LDBatchRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LDBatchRequest.h; sourceTree = "<group>"; };
 		58983F491E2CA9DB00F28C7D /* LDBatchRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LDBatchRequest.m; sourceTree = "<group>"; };
 		58983F4B1E2CA9F200F28C7D /* LDBatchRequestAgent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LDBatchRequestAgent.h; sourceTree = "<group>"; };
@@ -132,12 +129,10 @@
 				585B88DC1E232ABD00651C4E /* AppDelegate.m */,
 				585B88DE1E232ABD00651C4E /* ViewController.h */,
 				585B88DF1E232ABD00651C4E /* ViewController.m */,
-				58983F451E2CA51000F28C7D /* RegisterApi.h */,
-				58983F461E2CA51000F28C7D /* RegisterApi.m */,
 				58983F4E1E2CB7C100F28C7D /* UploadimageApi.h */,
 				58983F4F1E2CB7C100F28C7D /* UploadimageApi.m */,
-				588742DB1E2F466F00FF58FF /* testApi.h */,
-				588742DC1E2F466F00FF58FF /* testApi.m */,
+				588742DB1E2F466F00FF58FF /* RegisterApi.h */,
+				588742DC1E2F466F00FF58FF /* RegisterApi.m */,
 				585B88E11E232ABD00651C4E /* Main.storyboard */,
 				585B88E41E232ABD00651C4E /* Assets.xcassets */,
 				585B88E61E232ABD00651C4E /* LaunchScreen.storyboard */,
@@ -306,8 +301,7 @@
 				58BB7B431E34ACEA001FE1B5 /* MBProgressHUD.m in Sources */,
 				585B88DA1E232ABD00651C4E /* main.m in Sources */,
 				58983F4A1E2CA9DB00F28C7D /* LDBatchRequest.m in Sources */,
-				58983F471E2CA51000F28C7D /* RegisterApi.m in Sources */,
-				588742DD1E2F466F00FF58FF /* testApi.m in Sources */,
+				588742DD1E2F466F00FF58FF /* RegisterApi.m in Sources */,
 				585B88FF1E232ACF00651C4E /* AFSecurityPolicy.m in Sources */,
 				585B89001E232ACF00651C4E /* AFURLRequestSerialization.m in Sources */,
 				58983F411E2C76E100F28C7D /* LDNetworkPrivate.m in Sources */,

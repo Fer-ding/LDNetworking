@@ -13,12 +13,9 @@
     UIImage *_image;
 }
 
-- (id)initWithImage:(UIImage *)image {
-    self = [super init];
-    if (self) {
-        _image = image;
-    }
-    return self;
+- (void)loadDataWithImage:(UIImage *)image {
+    _image = image;
+    [self loadData];
 }
 
 - (LDRequestType)requestType {
@@ -39,9 +36,9 @@
     };
 }
 
-- (NSString *)responseImageId {
+- (void)requestCompleteFilter {
     NSDictionary *dict = self.responseJSONObject;
-    return dict[@"imageId"];
+    NSString *imageId = dict[@"imageId"];
 }
 
 

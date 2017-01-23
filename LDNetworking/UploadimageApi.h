@@ -6,13 +6,11 @@
 //  Copyright © 2017年 LeapDing. All rights reserved.
 //
 
-#import "LDBaseRequest.h"
+#import "LDRequest.h"
 #import <UIKit/UIKit.h>
 
-@interface UploadimageApi : LDBaseRequest
+@interface UploadimageApi : LDRequest
 
-- (id)initWithImage:(UIImage *)image;
-
-- (NSString *)responseImageId;
+- (void)loadDataWithImage:(UIImage *)image;
 
 @end
