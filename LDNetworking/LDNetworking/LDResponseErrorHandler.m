@@ -28,16 +28,17 @@
             request.error = [NSError errorWithDomain:NSCocoaErrorDomain code:errorCode userInfo:@{NSLocalizedDescriptionKey:message}];
             errorHandler(request.error);
         } else {
-            NSInteger errorCode = 200;
+            NSInteger errorCode = LDResponseErrorTypeSuccess;
             NSString *message = @"";
             if ([request.responseJSONObject[@"status"] isEqualToString:@"false"]) {
 //                return NO;
+                errorCode = LDResponseErrorTypeContentError;//请求成功，但内容不正确
             } else {
                 //其他的错误解析逻辑，包含重新暂时不返回回调重新发起网络请求
                 //注意只修改errorCode和message就行了，下面会统一生成新的error
                 //如果是重新发起网络请求，发起网络请求后就直接return，不再执行下面的逻辑
             }
-            if (errorCode != 200) {
+            if (errorCode != LDResponseErrorTypeSuccess) {
                 request.error = [NSError errorWithDomain:NSCocoaErrorDomain code:errorCode userInfo:@{NSLocalizedDescriptionKey:message}];
                 if (errorHandler) {
                     errorHandler(request.error);
