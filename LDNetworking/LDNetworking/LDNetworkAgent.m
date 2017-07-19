@@ -110,6 +110,7 @@
         default:
             return nil;
     }
+
 }
 
 - (void)addRequest:(LDBaseRequest *)request {
@@ -121,6 +122,24 @@
     
     if (requestSerializationError) {
         [self requestDidFailWithRequest:request error:requestSerializationError];
+    }
+    
+    // Set request task priority
+    // !!Available on iOS 8 +
+    if ([request.requestTask respondsToSelector:@selector(priority)]) {
+        switch (request.requestPriority) {
+            case LDRequestPriorityHigh:
+                request.requestTask.priority = NSURLSessionTaskPriorityHigh;
+                break;
+            case LDRequestPriorityLow:
+                request.requestTask.priority = NSURLSessionTaskPriorityLow;
+                break;
+            case LDRequestPriorityDefault:
+                /*!!fall through*/
+            default:
+                request.requestTask.priority = NSURLSessionTaskPriorityDefault;
+                break;
+        }
     }
     
     // Retain request
@@ -218,13 +237,18 @@
 
 - (void)requestDidSucceedWithRequest:(LDBaseRequest *)request {
     
-    [request requestCompleteFilter];
-    if ([request.delegate respondsToSelector:@selector(requestDidSuccess:)]) {
-        [request.delegate requestDidSuccess:request];
-    }
-    if (request.successCompletionBlock) {
-        request.successCompletionBlock(request);
-    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [request toggleAccessoriesWillStopCallBack];
+        [request requestCompleteFilter];
+        
+        if ([request.delegate respondsToSelector:@selector(requestDidSuccess:)]) {
+            [request.delegate requestDidSuccess:request];
+        }
+        if (request.successCompletionBlock) {
+            request.successCompletionBlock(request);
+        }
+        [request toggleAccessoriesDidStopCallBack];
+    });
 }
 
 - (void)requestDidFailWithRequest:(LDBaseRequest *)request error:(NSError *)error {
@@ -232,16 +256,30 @@
     [LDResponseErrorHandler errorHandlerWithRequest:request errorHandler:^(NSError *newError) {
         [self errorAlertRequestResult:request];
     }];
-    LDLog(@"Request %@ failed, status code = %ld, error = %@",
-           NSStringFromClass([request class]), (long)request.responseStatusCode, error.localizedDescription);
     
-    [request requestFailedFilter];
+    LDLog(@"Request %@ failed, status code = %ld, error = %@",
+       NSStringFromClass([request class]), (long)request.responseStatusCode, error.localizedDescription);
+    
     if ([request.delegate respondsToSelector:@selector(requestDidFailed:)]) {
         [request.delegate requestDidFailed:request];
     }
     if (request.failureCompletionBlock) {
         request.failureCompletionBlock(request);
     }
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [request toggleAccessoriesWillStopCallBack];
+        [request requestFailedFilter];
+        
+        if ([request.delegate respondsToSelector:@selector(requestDidFailed:)]) {
+            [request.delegate requestDidFailed:request];
+        }
+        if (request.failureCompletionBlock) {
+            request.failureCompletionBlock(request);
+        }
+        [request toggleAccessoriesDidStopCallBack];
+    });
+
 }
 
 - (void)errorAlertRequestResult:(LDBaseRequest *)request {

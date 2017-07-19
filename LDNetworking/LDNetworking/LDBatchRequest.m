@@ -45,6 +45,7 @@
     }
     _failedRequest = nil;
     [[LDBatchRequestAgent sharedInstance] addBatchRequest:self];
+    [self toggleAccessoriesWillStartCallBack];
     for (LDRequest * req in _requestArray) {
         req.delegate = self;
         [req clearCompletionBlock];
@@ -53,8 +54,10 @@
 }
 
 - (void)cancel {
+    [self toggleAccessoriesWillStopCallBack];
     _delegate = nil;
     [self clearRequest];
+    [self toggleAccessoriesDidStopCallBack];
     [[LDBatchRequestAgent sharedInstance] removeBatchRequest:self];
 }
 
@@ -90,6 +93,7 @@
 - (void)requestDidSuccess:(LDRequest *)request {
     _finishedCount++;
     if (_finishedCount == _requestArray.count) {
+        [self toggleAccessoriesWillStopCallBack];
         if ([_delegate respondsToSelector:@selector(batchRequestDidSuccess:)]) {
             [_delegate batchRequestDidSuccess:self];
         }
@@ -97,12 +101,14 @@
             _successCompletionBlock(self);
         }
         [self clearCompletionBlock];
+        [self toggleAccessoriesDidStopCallBack];
         [[LDBatchRequestAgent sharedInstance] removeBatchRequest:self];
     }
 }
 
 - (void)requestDidFailed:(LDRequest *)request {
     _failedRequest = request;
+    [self toggleAccessoriesWillStopCallBack];
     
     // Cancel
     for (LDRequest *req in _requestArray) {
@@ -118,6 +124,7 @@
     }
     //Clear
     [self clearCompletionBlock];
+    [self toggleAccessoriesDidStopCallBack];
     
     [[LDBatchRequestAgent sharedInstance] removeBatchRequest:self];
 }
@@ -128,5 +135,15 @@
     }
     [self clearCompletionBlock];
 }
+
+#pragma mark - Request Accessoies
+
+- (void)addAccessory:(id<LDRequestAccessory>)accessory {
+    if (!self.requestAccessories) {
+        self.requestAccessories = [NSMutableArray array];
+    }
+    [self.requestAccessories addObject:accessory];
+}
+
 
 @end

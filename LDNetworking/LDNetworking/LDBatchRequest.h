@@ -27,6 +27,7 @@
 @property (nonatomic, copy) void (^successCompletionBlock)(LDBatchRequest *);
 @property (nonatomic, copy) void (^failureCompletionBlock)(LDBatchRequest *);
 @property (nonatomic, strong, readonly) LDBaseRequest *failedRequest;
+@property (nonatomic, strong) NSMutableArray<id<LDRequestAccessory>> *requestAccessories;
 
 - (instancetype)initWithRequestArray:(NSArray<LDBaseRequest *> *)requestArray;
 
@@ -38,6 +39,9 @@
 
 /// 把block置nil来打破循环引用
 - (void)clearCompletionBlock;
+
+/// Request Accessory，可以hook Request的start和stop
+- (void)addAccessory:(id<LDRequestAccessory>)accessory;
 
 //取消网络请求
 - (void)cancel;

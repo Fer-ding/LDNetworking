@@ -10,6 +10,7 @@
 #import "RegisterApi.h"
 #import "UploadimageApi.h"
 #import "LDBatchRequest.h"
+#import "LDBaseRequest+AnimatingAccessory.h"
 
 @interface ViewController ()<LDBaseRequestCallBackDelegate>
 
@@ -23,6 +24,7 @@
     
     RegisterApi *api = [[RegisterApi alloc] init];
     api.delegate = self;
+    api.animatingText = @"";
    [api loadDataWithUserName:@"huige" pwd:@"123456"];
     
 //    [api loadData];

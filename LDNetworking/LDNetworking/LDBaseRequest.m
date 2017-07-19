@@ -10,6 +10,7 @@
 #import "AFNetworking.h"
 #import "LDNetworkAgent.h"
 #import "LDNetworkConfig.h"
+#import "LDNetworkPrivate.h"
 
 NSString *const LDRequestErrorDomain = @"com.leapDing.request.error";
 
@@ -63,6 +64,7 @@ NSString *const LDRequestErrorDomain = @"com.leapDing.request.error";
 #pragma mark - Request Action
 
 - (void)loadData {
+    [self toggleAccessoriesWillStartCallBack];
     [[LDNetworkAgent sharedInstance] addRequest:self];
 }
 
@@ -88,8 +90,10 @@ NSString *const LDRequestErrorDomain = @"com.leapDing.request.error";
 }
 
 - (void)cancel {
+    [self toggleAccessoriesWillStopCallBack];
     self.delegate = nil;
     [[LDNetworkAgent sharedInstance] cancelRequest:self];
+    [self toggleAccessoriesDidStopCallBack];
 }
 
 #pragma mark - Subclass Override
@@ -139,6 +143,15 @@ NSString *const LDRequestErrorDomain = @"com.leapDing.request.error";
 - (BOOL)statusCodeValidator {
     NSInteger statusCode = [self responseStatusCode];
     return (statusCode >= 200 && statusCode <= 299);
+}
+
+#pragma mark - Request Accessories
+
+- (void)addAccessory:(id<LDRequestAccessory>)accessory {
+    if (!self.requestAccessories) {
+        self.requestAccessories = [NSMutableArray array];
+    }
+    [self.requestAccessories addObject:accessory];
 }
 
 @end

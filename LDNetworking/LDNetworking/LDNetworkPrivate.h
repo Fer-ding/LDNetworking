@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "LDBaseRequest.h"
+#import "LDBatchRequest.h"
 
 FOUNDATION_EXPORT void LDLog(NSString *format, ...) NS_FORMAT_FUNCTION(1,2);
 
@@ -19,6 +20,22 @@ FOUNDATION_EXPORT void LDLog(NSString *format, ...) NS_FORMAT_FUNCTION(1,2);
 + (void)addDoNotBackupAttribute:(NSString *)path;
 
 + (NSString *)md5StringFromString:(NSString *)string;
+
+@end
+
+@interface LDBaseRequest (RequestAccessory)
+
+- (void)toggleAccessoriesWillStartCallBack;
+- (void)toggleAccessoriesWillStopCallBack;
+- (void)toggleAccessoriesDidStopCallBack;
+
+@end
+
+@interface LDBatchRequest (RequestAccessory)
+
+- (void)toggleAccessoriesWillStartCallBack;
+- (void)toggleAccessoriesWillStopCallBack;
+- (void)toggleAccessoriesDidStopCallBack;
 
 @end
 

@@ -20,6 +20,12 @@ typedef NS_ENUM(NSUInteger, LDRequestType) {
     LDRequestTypePost,
     LDRequestTypeUpload      //上传文件
 };
+    
+typedef NS_ENUM(NSInteger , LDRequestPriority) {
+    LDRequestPriorityLow = -4L,
+    LDRequestPriorityDefault = 0,
+    LDRequestPriorityHigh = 4,
+};
 
 @protocol AFMultipartFormData;
 
@@ -27,6 +33,17 @@ typedef NS_ENUM(NSUInteger, LDRequestType) {
 
 typedef void (^AFConstructingBlock)(id<AFMultipartFormData> formData);
 typedef void(^LDRequestCompletionBlock)(__kindof LDBaseRequest *request);
+
+/// Request Accessory，可以hook Request的start和stop
+@protocol LDRequestAccessory <NSObject>
+
+@optional
+
+- (void)requestWillStart:(id)request;
+- (void)requestWillStop:(id)request;
+- (void)requestDidStop:(id)request;
+
+@end
 
 //api回调
 @protocol LDBaseRequestCallBackDelegate <NSObject>
@@ -71,8 +88,12 @@ typedef void(^LDRequestCompletionBlock)(__kindof LDBaseRequest *request);
 @property (nonatomic, strong) id responseObject;
 @property (nonatomic, strong) id responseJSONObject;
 @property (nonatomic, strong) NSError *error;
+@property (nonatomic, strong) NSMutableArray<id<LDRequestAccessory>> *requestAccessories;
 @property (nonatomic, readonly, getter=isCancelled) BOOL cancelled;
 @property (nonatomic, readonly, getter=isExecuting) BOOL executing;
+
+/// 请求的优先级, 优先级高的请求会从请求队列中优先出列.Default is `YTKRequestPriorityDefault`.
+@property (nonatomic, assign) LDRequestPriority requestPriority;
 
 /** 调用接口 */
 - (void)loadData;
@@ -82,6 +103,9 @@ typedef void(^LDRequestCompletionBlock)(__kindof LDBaseRequest *request);
 
 /// 把block置nil来打破循环引用
 - (void)clearCompletionBlock;
+
+/// Request Accessory，可以hook Request的start和stop
+- (void)addAccessory:(id<LDRequestAccessory>)accessory;
 
 //取消全部网络请求
 - (void)cancelAllRequests;
