@@ -92,7 +92,7 @@ typedef void(^LDRequestCompletionBlock)(__kindof LDBaseRequest *request);
 @property (nonatomic, readonly, getter=isCancelled) BOOL cancelled;
 @property (nonatomic, readonly, getter=isExecuting) BOOL executing;
 
-/// 请求的优先级, 优先级高的请求会从请求队列中优先出列.Default is `YTKRequestPriorityDefault`.
+/// 请求的优先级, 优先级高的请求会从请求队列中优先出列.Default is `LDRequestPriorityDefault`.
 @property (nonatomic, assign) LDRequestPriority requestPriority;
 
 /** 调用接口 */
